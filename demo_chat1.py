@@ -21,9 +21,12 @@ import csv                         #
 import sys
 import re
 
-csvFile  = "/home/pi/bezelie/edgar/chatDialog.csv"        # 対話リスト
-jsonFile = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
-ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh"     # 音声合成
+#csvFile  = "/home/pi/bezelie/edgar/chatDialog.csv"        # 対話リスト
+#jsonFile = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
+#ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh"     # 音声合成
+csvFile  = "chatDialog.csv"        # 対話リスト
+jsonFile = "data_chat.json"        # 設定ファイル
+ttsFile  = "exec_openJTalk.sh"     # 音声合成
 
 # 設定ファイルの読み込み
 f = open (jsonFile,'r')
@@ -38,7 +41,7 @@ muteTime = 1        # 音声入力を無視する時間
 bufferSize = 256    # 受信するデータの最大バイト。２の倍数が望ましい。
 alarmStop = False   # アラームのスヌーズ機能（非搭載）
 is_playing = False  # 再生中か否かのフラグ
-mode = "normal"     # manualモードでは音声認識ではなくスイッチで話す
+waitTime = 5        # autoモードでの会話の間隔
 
 # サーボの初期化
 bez = bezelie.Control()                 # べゼリー操作インスタンスの生成
@@ -46,7 +49,7 @@ bez.moveCenter()                        # サーボの回転位置をトリム�
 
 # GPIOの設定
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(24, GPIO.IN)          # スイッチでモード(normal/manual)を切り替えたいときに使います。
+GPIO.setup(24, GPIO.IN)            # モード(normal/auto)を切り替えたいときに使います。
 
 # TCPクライアントを作成しJuliusサーバーに接続する
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -139,11 +142,10 @@ def replyMessage(keyWord):        # 対話
       j = randint(1,100)          # １から１００までの乱数を発生させる
       data1.append(i+[j]+[index]) # data1=質問内容,返答,乱数,連番のリスト
 
-  if data1 == []:                 # data1が空っぽだったら質問内容は不一致として処理する
+  if data1 == []:                 # data1が空っぽだったらランダムで返す
     for index,i in enumerate(data): 
-      if i[0]=='その他':           
-        j = randint(1,100)         
-        data1.append(i+[j]+[index])
+      j = randint(1,100)         
+      data1.append(i+[j]+[index])
 
   maxNum = 0                      # 複数の候補からランダムで選出。data1から欄数値が最大なものを選ぶ
   for i in data1:                 # 
@@ -179,29 +181,6 @@ def replyMessage(keyWord):        # 対話
   subprocess.call('sudo amixer -q sset Mic '+mic+' -c 0', shell=True)  # マイク感受性を元に戻す
   is_playing = False
   debug_message('60: Reply Finished')
-
-def check_mode():
-  subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True) # マイク感受性
-  mode = "normal"
-  if GPIO.input(24)==GPIO.LOW:    # normal mode
-    # print "起動完了"
-    subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
-    subprocess.call("sh "+ttsFile+" "+u"ぼくは"+name, shell=True)
-  else:                           # manual mode
-    mode = "manual"
-    # print "手動モード"
-    subprocess.call("sh "+ttsFile+" "+"手動モード", shell=True)
-    manual_mode()
-
-def manual_mode():
-  while True:
-    if GPIO.input(24)==GPIO.HIGH:
-      replyMessage(u'デモ')
-      sleep(0.2)
-    else:
-      pass
-    sleep(0.1)
-    bez.stop()
 
 def socket_buffer_clear():
   while True:
@@ -247,19 +226,26 @@ def main():
     subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
     data = ""
     bez.moveAct('happy')
-    check_mode()                    # GPIO24が押されていたらマニュアルモードに切り替える
-    bez.stop()
+    subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True) # マイク感受性
+    subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
+    subprocess.call("sh "+ttsFile+" "+u"ぼくは"+name, shell=True)
     subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感受性
+    bez.stop()
     while True:
-      if "</RECOGOUT>\n." in data:  # RECOGOUTツリーの最終行を見つけたら以下の処理を行う
-        debug_message('20: Recognized')
-        parse_recogout(data)
-        debug_message('90: Session End')
-        data = ""  # 認識終了したのでデータをリセットする
+      if GPIO.input(24)==GPIO.HIGH:    # auto mode
+        debug_message('auto mode')
+        replyMessage("")
+        sleep(waitTime)
       else:
-        debug_message('10: Listening...')
-        data = data + client.recv(bufferSize)  # Juliusサーバーから受信
-        # /RECOGOUTに達するまで受信データを追加していく
+        if "</RECOGOUT>\n." in data:  # RECOGOUTツリーの最終行を見つけたら以下の処理を行う
+          debug_message('20: Recognized')
+          parse_recogout(data)
+          debug_message('90: Session End')
+          data = ""  # 認識終了したのでデータをリセットする
+        else:
+          debug_message('10: Listening...')
+          data = data + client.recv(bufferSize)  # Juliusサーバーから受信
+          # /RECOGOUTに達するまで受信データを追加していく
 
   except KeyboardInterrupt: # CTRL+Cで終了
     debug_message('keyboard interrupted')
