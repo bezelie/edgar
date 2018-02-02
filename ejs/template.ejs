@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta http-equiv="content-type"
+        content="text/html; charset=UTF-8">
+    <title><%=title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"><!-- モバイル端末の画面サイズに合わせる -->
+    <style>
+        body { font-size:16pt; color:#000080; background-color:#FFFFFF; text-align:left;}
+        h1   { font-size:20pt; color:#000000; background-color:#FFA500; text-align:center;}
+        h2   { font-size:16pt; color:#FF0000; background-color:#FFFFFF; text-align:center;}
+        h6   { font-size:10pt; color:#000000; background-color:#FFA500; text-align:center;}
+        p    { font-size:14pt; color:#000000; background-color:#FFFFFF; text-align:left;}
+    </style>
+</head> 
+<body>
+    <basefont size="12">
+    <header>
+        <h1 id="h1"><%=title %></h1>
+    </header>
+        <h2 id="h2"><%=errorMsg %></h2>
+    <div role="main">
+        <p><%-content %></p>
+    </div>
+    <div role="footer">
+        <HR>
+        <h6> Team Bezelie </h6>
+    </dim>
+</body>
+</html>

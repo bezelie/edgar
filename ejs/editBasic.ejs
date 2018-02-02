@@ -1,0 +1,40 @@
+<!-- editBasic -->
+
+<script>
+</script>
+<%
+var alarmOn0 = '', alarmOn1 = '', alarmKind0 = '', alarmKind1 = ''
+%>
+
+<p><%=message%></p>
+<hr>
+<center>
+<form method="post" action="/setBasic" id="form">
+<table border="1">
+    <tr align="center">
+        <td>ロボットの名前</td><td align="right"><input type="text" size="10" name="name" 
+        value=<%= obj_config.data0[0].name %> style="font-size:16px; text-align:center"></td>
+    </tr>
+    <tr align="center">
+        <td>ユーザーの名前</td><td align="right"><input type="text" size="10" name="user" 
+        value=<%= obj_config.data0[0].user %> style="font-size:16px; text-align:center"></td>
+    </tr>
+    <tr align="center">
+        <td>マイク感度</td><td align="right"><input type="number" size="50" name="mic" min="0" max="65" step="5" 
+        value=<%= obj_config.data0[0].mic %> style="font-size:16px; text-align:right"></td>
+    </tr>
+    <tr align="center">
+        <td>スピーカー音量</td><td align="right"><input type="number" size="50" name="vol" min="50" max="90" step="10" 
+        value=<%= obj_config.data0[0].vol %> style="font-size:16px; text-align:right"></td>
+    </tr>
+    <tr align="center">
+        <td colspan="2"><input type="submit" value="設定を更新する" style="font-size:16px;"></td>
+    </tr>
+</table>
+</form>
+</center>
+<p><a href="/">トップページに戻る</a></p>
+<script>
+document.getElementById('form').onsubmit = function(){
+}
+</script>

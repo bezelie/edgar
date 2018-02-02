@@ -1,0 +1,50 @@
+<!-- edit dialog -->
+<%
+%>
+
+<body>
+<p>質問内容として「<%= intent %>」が選ばれています</p>
+<p><%= message %></p>
+<hr>
+<form method="post" action="/editDialog" id="addItem">
+<table border="1">
+    <tr align="center"><td>新たに追加したい返答候補</td><td><input type="text" name="newItem"></td>
+    <td><input type="submit" value="追加" style="font-size:16px;"></td></tr>
+</table>
+</form>
+<form method="post" action="/editDialog" id="delItem">
+<table border="1">
+    <tr align="center"><td>削除したい返答候補の番号</td><td><input type="text" name="delNum"></td>
+    <td><input type="submit" value="削除" style="font-size:16px;"></td></tr>
+</table>
+</form>
+    <ul>
+        <% for (var i=0;i < posts.length; i++ ) { %>
+            <% if (posts[i][0]==intent){ %>
+                <li><%= i+"："+posts[i][1] %></li>
+        <% }} %>
+    </ul>
+<br>
+<p><a href="/selectIntent4dialog">質問内容を切り替える</a></p>
+<p><a href="/editChat">会話編集ページに戻る</a></p>
+<p><a href="/">トップページに戻る</a></p>
+</body>
+
+<script>
+window.onload = function(){
+}
+document.getElementById('addItem').onsubmit = function(){
+    var keyword = document.getElementById('addItem').newItem.value;
+    if (keyword.length == 0){
+        window.alert('入力欄に追加したい返答候補を入力してください');
+        return false;
+    }
+}
+document.getElementById('delItem').onsubmit = function(){
+    var keyword = document.getElementById('delItem').delNum.value;
+    if (keyword.length == 0){
+        window.alert('入力欄に削除したい返答候補の番号を入力してください');
+        return false;
+    }
+}
+</script>
