@@ -1,0 +1,14 @@
+[Unit]
+Description = starting dhcp service
+After=syslog.target network.target
+ConditionPathExists=/opt/bezelie/bin
+
+[Service]
+ExecStart=/opt/bezelie/bin/boot_dhcp.sh
+Type=forking
+Restart=no
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target

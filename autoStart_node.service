@@ -1,0 +1,14 @@
+[Unit]
+Description = starting node-js
+After=autoStart_dhcp.service
+ConditionPathExists=/opt/bezelie/bin
+
+[Service]
+ExecStart=/opt/bezelie/bin/boot_node.sh
+Type=forking
+Restart=no
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target

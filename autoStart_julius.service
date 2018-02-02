@@ -1,0 +1,14 @@
+[Unit]
+Description=starting julius
+After=syslog.target sockets.target network.target network-online.target
+ConditionPathExists=/opt/bezelie/bin
+
+[Service]
+ExecStart=/opt/bezelie/bin/boot_julius.sh
+Type=forking
+Restart=no
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
