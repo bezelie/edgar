@@ -20,12 +20,10 @@ import json                        #
 import csv                         #
 import sys
 import re
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
 
-csvFile  = "/home/pi/bezelie/dev_edgar/chatDialog.csv"        # 対話リスト
-jsonFile = "/home/pi/bezelie/dev_edgar/data_chat.json"        # 設定ファイル
-ttsFile  = "/home/pi/bezelie/dev_edgar/exec_openJTalk.sh"     # 音声合成
+csvFile  = "/home/pi/bezelie/edgar/chatDialog.csv"        # 対話リスト
+jsonFile = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
+ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh"     # 音声合成
 
 # 設定ファイルの読み込み
 f = open (jsonFile,'r')
