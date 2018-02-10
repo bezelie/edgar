@@ -243,11 +243,11 @@ def main():
     subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
     subprocess.call("sh "+ttsFile+" "+u"ぼく"+name, shell=True)
     bez.stop()
-    sleep (1)
     subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感受性
     data = ""
+    socket_buffer_clear()
     if mode == True:           # 音声認識モード
-      subprocess.call('sh exec_camera.sh', shell=True)            # カメラの映像をディスプレイに表示
+      # subprocess.call('sh exec_camera.sh', shell=True)            # カメラの映像をディスプレイに表示
       while True:
         if "</RECOGOUT>\n." in data:  # RECOGOUTツリーの最終行を見つけたら以下の処理を行う
           debug_message('20: Recognized')
@@ -288,7 +288,7 @@ def main():
                   (0,0,255), thickness=2)                         # Color and thickness
               replyMessage(u"顔認識")
 
-            cv2.imshow('frame', stream.array)                     # Display the stream
+            # cv2.imshow('frame', stream.array)                     # Display the stream
 
             if cv2.waitKey(1) & 0xFF == ord('q'):                 # Quit operation
               break
