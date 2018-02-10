@@ -21,12 +21,9 @@ import csv                         #
 import sys
 import re
 
-#csvFile  = "/home/pi/bezelie/edgar/chatDialog.csv"        # 対話リスト
-#jsonFile = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
-#ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh"     # 音声合成
-csvFile  = "chatDialog.csv"        # 対話リスト
-jsonFile = "data_chat.json"        # 設定ファイル
-ttsFile  = "exec_openJTalk.sh"     # 音声合成
+csvFile  = "/home/pi/bezelie/edgar/chatDialog.csv"        # 対話リスト
+jsonFile = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
+ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh"     # 音声合成
 
 # 設定ファイルの読み込み
 f = open (jsonFile,'r')
@@ -223,10 +220,11 @@ def main():
   t.setDaemon(True)
   t.start()
   try:
+    subprocess.call('sh exec_camera.sh', shell=True)            # カメラの映像をディスプレイに表示
     subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
     data = ""
     bez.moveAct('happy')
-    subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True) # マイク感受性
+    subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイク感受性
     subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
     subprocess.call("sh "+ttsFile+" "+u"ぼくは"+name, shell=True)
     subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感受性

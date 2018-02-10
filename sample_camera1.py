@@ -14,8 +14,8 @@ bez.moveCenter()                      # サーボをセンタリング
 def main():
   try:
     with picamera.PiCamera() as camera:
-      camera.resolution = (800, 480)   # change this number depending on your display
-      camera.rotation = 180            # comment out if your screen is upside down
+      camera.resolution = (800, 480)   # お使いのディスプレイに合わせて調整してください
+      camera.rotation = 180            # 画面が上下逆さまだったらこの行は削除してください。
       camera.start_preview()
       sleep(2)
       head = 0
