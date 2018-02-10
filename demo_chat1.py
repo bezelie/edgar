@@ -237,17 +237,17 @@ def main():
   t.setDaemon(True)
   t.start()
   try:
-    subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
-    bez.moveAct('happy')
-    subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイク感受性
-    subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
-    subprocess.call("sh "+ttsFile+" "+u"ぼく"+name, shell=True)
-    bez.stop()
-    subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感受性
-    data = ""
-    socket_buffer_clear()
     if mode == True:           # 音声認識モード
+      subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
+      bez.moveAct('happy')
+      subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイク感受性
+      subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
+      subprocess.call("sh "+ttsFile+" "+u"ぼく"+name, shell=True)
+      bez.stop()
+      subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感受性
+      data = ""
       # subprocess.call('sh exec_camera.sh', shell=True)            # カメラの映像をディスプレイに表示
+      socket_buffer_clear()
       while True:
         if "</RECOGOUT>\n." in data:  # RECOGOUTツリーの最終行を見つけたら以下の処理を行う
           debug_message('20: Recognized')
@@ -260,6 +260,8 @@ def main():
           # /RECOGOUTに達するまで受信データを追加していく
     else:                      # 顔認識モード
       debug_message('face detection mode')
+      subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
+      subprocess.call("sh "+ttsFile+" "+u"顔認識モード", shell=True)
       stageAngle = 0           # ステージの初期角度
       stageDelta = 5           # ループごとにステージを回転させる角度
       stageSpeed = 8           # ループごとにステージを回転させる速度
