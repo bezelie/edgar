@@ -7,14 +7,14 @@
 # from Aug15th2017
 
 from time import sleep             # ウェイト処理
-import subprocess                  #
+import subprocess                  # 外部プロセスを実行するモジュール
 import bezelie                     # べゼリー専用モジュール
 import socket                      # ソケット通信モジュール
 import select                      # 待機モジュール
-import json                        #
-import csv                         #
-import sys                         # 
-import re                          # 正規表現
+import json                        # jsonファイルを扱うモジュール
+import csv                         # CSVファイルを扱うモジュール
+import sys                         # python終了sys.exit()のために必要
+import re                          # 正規表現モジュール
 import xml.etree.ElementTree as ET # XMLエレメンタルツリー変換モジュール
 
 jsonFile = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル

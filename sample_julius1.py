@@ -7,14 +7,14 @@
 # from Aug15th2017
 
 from time import sleep             # ウェイト処理
-import subprocess                  #
+import subprocess                  # 外部プロセスを実行するモジュール
 import bezelie                     # べゼリー専用モジュール
 import socket                      # ソケット通信モジュール
 import select                      # 待機モジュール
-import json                        #
-import csv                         #
-import sys                         # 
-import re                          # 正規表現
+import json                        # jsonファイルを扱うモジュール
+import csv                         # CSVファイルを扱うモジュール
+import sys                         # python終了sys.exit()のために必要
+import re                          # 正規表現モジュール
 
 jsonFile = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
 ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh"     # 音声合成
@@ -33,7 +33,6 @@ bufferSize = 256    # 受信するデータの最大バイト。２の倍数が�
 def socket_buffer_clear():
   while True:
     rlist, _, _ = select.select([client], [], [], 1)
-
     if len(rlist) > 0: 
       dummy_buffer = client.recv(bufferSize)
     else:
@@ -82,11 +81,9 @@ def main():
       else:
         data = data + client.recv(bufferSize)  # Juliusサーバーから受信
         # /RECOGOUTに達するまで受信データを追加していく
-
   except KeyboardInterrupt: # CTRL+Cで終了
     client.close()
     bez.moveCenter()
-    bez.stop()
     sys.exit(0)
 
 if __name__ == "__main__":

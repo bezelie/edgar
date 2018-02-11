@@ -7,12 +7,12 @@
 from time import sleep                # ウェイト処理
 import bezelie                        # べゼリー専用モジュール
 
-# Setting
+# 準備
 bez = bezelie.Control()               # べゼリー操作インスタンスの生成
 bez.moveCenter()                      # サーボをセンタリング
 sleep(0.5)
 
-# Main Loop
+# メインループ
 def main():
   try:
     print "開始します"

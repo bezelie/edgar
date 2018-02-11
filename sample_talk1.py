@@ -1,24 +1,25 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Bezelie Sample Code for Raspberry Pi : 発話するサンプル
-# ミニジャックにスピーカーなどを接続してから試してください。
+# スピーカーなどを接続してから試してください。
 
 # ライブラリの読み込み
-import subprocess                     # shellの実行をするためのライブラリ
 from time import sleep                # ウェイト処理
-import bezelie                        # べゼリー専用モジュール
+import subprocess                     # 外部プロセスを実行するモジュール
 
-# Variables
-openJTalkFile = "exec_openJTalk.sh"   # 発話シェルスクリプトのファイル名
+# 変数
+ttsFile = "exec_openJTalk.sh"         # 発話シェルスクリプトのファイル名
 
-# Main Loop
+# メインループ
 def main():
   try:
     while (True):
-      subprocess.call("sh "+openJTalkFile+" "+"こんにちわ", shell=True)
+      subprocess.call("sh "+ttsFile+" "+"こんにちわ", shell=True)
+#      subprocess.call('flite -voice "kal16" -t "Hello World!"', shell=True) # English
+       # Other English Voices :kal awb_time kal16 awb rms slt
       sleep(0.5)
   except KeyboardInterrupt:
-    print ' Interrupted by Keyboard'
+    print ' 終了しました'
 
 if __name__ == "__main__":
     main()

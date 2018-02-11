@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Bezelie Sample Code for Raspberry Pi : １秒おきに文字を画面に表示するだけのサンプルです
+# Bezelie Sample Code for Raspberry Pi : １秒おきに文字を画面に表示する
 
 # ライブラリの読み込み
 from time import sleep                 # ウェイト処理

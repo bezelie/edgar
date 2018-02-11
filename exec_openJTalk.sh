@@ -1,4 +1,5 @@
 #!/bin/bash
+# 音声合成（Open JTalk）起動スクリプト
 HTSVOICE=/usr/share/hts-voice/mei/mei_happy.htsvoice
 DICDIRE=/var/lib/mecab/dic/open-jtalk/naist-jdic/
 VOICEDATA=/tmp/voice.wav
@@ -19,3 +20,4 @@ sudo echo "$1" | open_jtalk \
 
 aplay -q -D plughw:1,0 $VOICEDATA
 sudo rm -f $VOICEDATA
+
