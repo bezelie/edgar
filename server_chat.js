@@ -48,6 +48,8 @@ var selectIntent4dialog = fs.readFileSync(__dirname + '/ejs/selectIntent4dialog.
 var editDialog          = fs.readFileSync(__dirname + '/ejs/editDialog.ejs', 'utf-8');
 var starting_pythonApp  = fs.readFileSync(__dirname + '/ejs/starting_pythonApp.ejs', 'utf-8');
 var reboot              = fs.readFileSync(__dirname + '/ejs/reboot.ejs', 'utf-8');
+var chatMode            = fs.readFileSync(__dirname + '/ejs/chatMode.ejs', 'utf-8');
+var faceMode            = fs.readFileSync(__dirname + '/ejs/faceMode.ejs', 'utf-8');
 var disableServer       = fs.readFileSync(__dirname + '/ejs/disableServer.ejs', 'utf-8');
 var test                = fs.readFileSync(__dirname + '/ejs/test.ejs', 'utf-8');
 
@@ -73,6 +75,14 @@ var routes = { // パスごとの表示内容を連想配列に格納
         "title":"サーボ調整",
         "message":"サーボの初期位置（角度）を調整します。単位は度です。サーボを上から見て時計回りが正の値になります",
         "content":editServo},
+    "/chatMode":{
+        "title":"再起動",
+        "message":"音声認識モードで再起動します",
+        "content":disableServer},
+    "/faceMode":{
+        "title":"再起動",
+        "message":"顔認識モードで再起動します",
+        "content":disableServer},
     "/disableServer":{
         "title":"再起動",
         "message":"プログラムを停止し、アクセスポイント化を無効にして再起動します",
@@ -128,11 +138,13 @@ var file_chatEntity            = "/home/pi/bezelie/chatEntity.csv";
 var file_chatDialog            = "/home/pi/bezelie/chatDialog.csv";
 var file_chatEntity_tsv        = "/home/pi/bezelie/chatEntity.tsv";
 var file_chatEntity_dic        = "/home/pi/bezelie/chatEntity.dic";
-var file_data_chat             = "/home/pi/bezelie/data_chat.json"
-var file_debug                 = "/home/pi/bezelie/debug.txt"
-var file_restart_app           = __dirname+"/restart_app.sh";
-var file_exec_talk             = __dirname+"/exec_openJTalk.sh"
-var file_setting_disableServer = __dirname+"/setting_disableServer.sh";
+var file_debug                 = "/home/pi/bezelie/debug.txt";
+var file_data_chat             = "/home/pi/bezelie/edgar/data_chat.json";
+var file_restart_app           = "/home/pi/bezelie/edgar/restart_app.sh";
+var file_exec_talk             = "/home/pi/bezelie/edgar/exec_openJTalk.sh";
+var file_setting_chatMode      = "/home/pi/bezelie/edgar/setting_chatMode.sh";
+var file_setting_faceMode      = "/home/pi/bezelie/edgar/setting_faceMode.sh";
+var file_setting_disableServer = "/home/pi/bezelie/edgar/setting_disableServer.sh";
 var errorMsg = ""; // これが空欄のときはエラー無し
 var posts = "";    // ブラウザからPOSTで送られてきたデータ
 var intent = "";   // 今回選択されたintent（単数）
@@ -247,6 +259,28 @@ function routing(req, res){ // requestイベントが発生したら実行され
             exec(COMMAND, function(error, stdout, stderr) {
               var COMMAND = 'sudo reboot';
               exec(COMMAND, function(error, stdout, stderr) {
+              }); // end of exec
+            }); // end of exec
+        } else if (url_parts.pathname === "/chatMode"){ // 音声認識モードで再起動
+            pageWrite(res);
+            var COMMAND = "sh "+file_exec_talk+" "+"音声認識モードで再起動します";
+            exec(COMMAND, function(error, stdout, stderr) {
+              var COMMAND = "sh "+file_setting_chatMode;
+              exec(COMMAND, function(error, stdout, stderr) {
+                var COMMAND = 'sudo reboot';
+                exec(COMMAND, function(error, stdout, stderr) {
+                }); // end of exec
+              }); // end of exec
+            }); // end of exec
+        } else if (url_parts.pathname === "/faceMode"){ // 顔認識モードで再起動
+            pageWrite(res);
+            var COMMAND = "sh "+file_exec_talk+" "+"顔認識モードで再起動します";
+            exec(COMMAND, function(error, stdout, stderr) {
+              var COMMAND = "sh "+file_setting_faceMode;
+              exec(COMMAND, function(error, stdout, stderr) {
+                var COMMAND = 'sudo reboot';
+                exec(COMMAND, function(error, stdout, stderr) {
+                }); // end of exec
               }); // end of exec
             }); // end of exec
         } else if (url_parts.pathname === "/disableServer"){ // サーバーを無効化して再起動

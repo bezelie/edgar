@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# 音声対話デモ
+# 顔認識デモ
 # for Bezelie Edgar
 # for Raspberry Pi
 # by Jun Toyoda (Team Bezelie)
@@ -9,19 +9,15 @@
 from datetime import datetime      # 現在時刻取得
 from random import randint         # 乱数の発生
 from time import sleep             # ウェイト処理
-import RPi.GPIO as GPIO
 import subprocess                  #
-import threading                   # マルチスレッド処理
 import traceback                   # デバッグ用
 import bezelie                     # べゼリー専用モジュール
-import socket                      # ソケット通信モジュール
-import select                      # 待機モジュール
 import json                        #
 import csv                         #
 import sys                         # 
-import re                          # 正規表現
 import picamera                    # 
 import picamera.array              # 
+import cv2                         # openCV
 
 csvFile   = "/home/pi/bezelie/chatDialog.csv"          # 対話リスト
 jsonFile  = "/home/pi/bezelie/edgar/data_chat.json"    # 設定ファイル
@@ -37,10 +33,13 @@ mic = jDict['data0'][0]['mic']         # マイク感度。62が最大値。
 vol = jDict['data0'][0]['vol']         # スピーカー音量。
 
 # 変数の初期化
-muteTime = 1        # 音声入力を無視する時間
-bufferSize = 256    # 受信するデータの最大バイト。２の倍数が望ましい。
 alarmStop = False   # アラームのスヌーズ機能（非搭載）
 is_playing = False  # 再生中か否かのフラグ
+waitTime = 5        # autoモードでの会話の間隔
+
+# openCV
+cascade_path =  "/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml" # 顔認識xml
+cascade = cv2.CascadeClassifier(cascade_path)
 
 # 関数
 def timeCheck(): # 活動時間内かどうかのチェック
@@ -67,43 +66,6 @@ def timeCheck(): # 活動時間内かどうかのチェック
     flag = False # It is not Active Time
   return flag
 
-def alarm():
-  global alarmStop
-  f = open (jsonFile,'r')
-  jDict = json.load(f)
-  alarmOn = jDict['data1'][0]['alarmOn']
-  alarmTime = jDict['data1'][0]['alarmTime']
-  alarmKind = jDict['data1'][0]['alarmKind']
-  # alarmVol = jDict['data1'][0]['alarmVol']
-  now = datetime.now()
-  # print 'Time: '+str(now.hour)+':'+str(now.minute)
-
-  #if True: # アラーム動作のチェック用
-  if int(now.hour) == int(alarmTime[0:2]) and int(now.minute) == int(alarmTime[3:5]):
-    if alarmOn == "true":
-      if alarmStop == False:
-        # print 'アラームの時間です'
-        subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)  #
-        if alarmKind == 'mild':
-          bez.moveAct('happy')
-          subprocess.call("sh "+ttsFile+" "+"朝ですよ", shell=True)
-          bez.stop()
-        else:
-          bez.moveAct('happy')
-          subprocess.call("sh "+ttsFile+" "+"朝だよ起きて起きてー", shell=True)
-          bez.stop()
-        sleep (muteTime)
-        subprocess.call('sudo amixer -q sset Mic '+mic+' -c 0', shell=True)  #
-      else:
-        # print '_'
-        alarmStop = False
-    # else:
-      # print 'アラームの時間ですが、アラームはオフになっています'
-
-  t=threading.Timer(20,alarm) # ｎ秒後にまたスレッドを起動する
-  t.setDaemon(True)           # メインスレッドが終了したら終了させる
-  t.start()
-
 def replyMessage(keyWord):        # 対話
   data = []                       # 対話ファイル（csv）を変数dataに読み込む
   with open(csvFile, 'rb') as f:  # csvFileをオープン
@@ -127,46 +89,16 @@ def replyMessage(keyWord):        # 対話
       maxNum = i[2]               # 
       ansNum = i[3]               #
 
-  # 発話
-  subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)  # 自分の声を認識してしまわないようにマイクを切る
-  is_playing = True
-
   # 設定ファイルの読み込み
   f = open (jsonFile,'r')
   jDict = json.load(f)
   mic = jDict['data0'][0]['mic']         # マイク感度の設定。62が最大値。
   vol = jDict['data0'][0]['vol']         # 
 
-  if timeCheck(): # 活動時間だったら会話する
-    bez.moveRnd()
-    subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True) # スピーカー音量
-    subprocess.call("sh "+ttsFile+" "+data[ansNum][1], shell=True)
-    bez.stop()
-  else:           # 活動時間外は会話しない
-    subprocess.call('amixer cset numid=1 60% -q', shell=True)      # スピーカー音量
-    subprocess.call("sh "+ttsFile+" "+"活動時間外です", shell=True)
-    sleep (5)
-    subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True) # スピーカー音量
-  #  print "活動時間外なので発声・動作しません"
-
-  alarmStop = True # 対話が発生したらアラームを止める
-  subprocess.call('sudo amixer -q sset Mic '+mic+' -c 0', shell=True)  # マイク感受性を元に戻す
-  is_playing = False
-
-def socket_buffer_clear():
-  while True:
-    rlist, _, _ = select.select([client], [], [], 1)
-
-    if len(rlist) > 0: 
-      dummy_buffer = client.recv(bufferSize)
-    else:
-      break
-
-def parse_recogout(data):
-  data = re.search(r'WORD\S+', data)    # \s
-  keyWord = data.group().replace("WORD=","").replace("\"","")
-  replyMessage(keyWord)
-  socket_buffer_clear()
+  bez.moveRnd()
+  subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True) # スピーカー音量
+  subprocess.call("sh "+ttsFile+" "+data[ansNum][1], shell=True)
+  bez.stop()
 
 def debug_message(message):
   print message
@@ -188,50 +120,57 @@ def writeFile(text): # デバッグファイル出力機能
 bez = bezelie.Control()                 # べゼリー操作インスタンスの生成
 bez.moveCenter()                        # サーボの回転位置をトリム値に合わせる
 
-# TCPクライアントを作成しJuliusサーバーに接続する
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-enabled_julius = False
-for count in range(3):
-  try:
-    client.connect(('localhost', 10500))
-    # client.connect(('10.0.0.1', 10500))  # Juliusサーバーに接続
-    enabled_julius = True
-    break
-  except socket.error, e:
-    # print 'failed socket connect. retry'
-    sleep (0.5)
-if enabled_julius == False:
-  print 'Could not find Julius'
-  sys.exit(1)
-
 # メインループ
 def main():
-  t=threading.Timer(10,alarm)
-  t.setDaemon(True)
-  t.start()
   try:
+    debug_message('face detection mode')
     subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
-    bez.moveAct('happy')
-    subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイク感受性
-    subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
-    subprocess.call("sh "+ttsFile+" "+u"ぼく"+name, shell=True)
-    bez.stop()
-    subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感受性
-    data = ""
-    # subprocess.call('sh exec_camera.sh', shell=True)            # カメラの映像をディスプレイに表示
-    socket_buffer_clear()
-    while True:
-      if "</RECOGOUT>\n." in data:  # RECOGOUTツリーの最終行を見つけたら以下の処理を行う
-        parse_recogout(data)
-        data = ""  # 認識終了したのでデータをリセットする
-      else:
-        debug_message('10: Listening...')
-        data = data + client.recv(bufferSize)  # Juliusサーバーから受信
-        # /RECOGOUTに達するまで受信データを追加していく
+    subprocess.call("sh "+ttsFile+" "+u"顔認識モード", shell=True)
+    stageAngle = 0           # ステージの初期角度
+    stageDelta = 5           # ループごとにステージを回転させる角度
+    stageSpeed = 8           # ループごとにステージを回転させる速度
+    if timeCheck(): # 活動時間だったら会話する
+      with picamera.PiCamera() as camera:                         # Open Pi-Camera as camera
+        with picamera.array.PiRGBArray(camera) as stream:         # Open Video Stream from Pi-Camera as stream
+          camera.resolution = (640, 480)                          # Display Resolution
+          # camera.resolution = (1280, 720)                       # Display Resolution
+          # camera.resolution = (1920, 1080)                      # Display Resolution
+          camera.hflip = True                                     # Vertical Flip 
+          camera.vflip = True                                     # Horizontal Flip
+          while True:
+            camera.capture(stream, 'bgr', use_video_port=True)    # Capture the Video Stream
+            gray = cv2.cvtColor(stream.array, cv2.COLOR_BGR2GRAY) # Convert BGR to Grayscale
+            facerect = cascade.detectMultiScale(gray,             # Find face from gray
+              scaleFactor=1.9,                                    # 1.1 - 1.9 :the bigger the quicker & less acurate 
+              minNeighbors=3,                                     # 3 - 6 : the smaller the more easy to detect
+              minSize=(100,120),                                   # Minimam face size 
+              maxSize=(640,480))                                  # Maximam face size
+            if len(facerect) > 0:
+              for rect in facerect:
+                cv2.rectangle(stream.array,                       # Draw a red rectangle at face place 
+                  tuple(rect[0:2]),                               # Upper Left
+                  tuple(rect[0:2]+rect[2:4]),                     # Lower Right
+                  (0,0,255), thickness=2)                         # Color and thickness
+              replyMessage(u"顔認識")
+            # cv2.imshow('frame', stream.array)                     # Display the stream
+            if cv2.waitKey(1) & 0xFF == ord('q'):                 # Quit operation
+              break
+            stream.seek(0)                                        # Reset the stream
+            stream.truncate()
+            stageAngle = stageAngle + stageDelta            
+            if stageAngle > 30 or stageAngle < -30:
+              stageDelta = stageDelta*(-1)
+            bez.moveStage(stageAngle,stageSpeed)
+          cv2.destroyAllWindows()
+
+    else:           # 活動時間外は動作しない
+      subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)  # スピーカー音量
+      subprocess.call("sh "+ttsFile+" "+"活動時間外です", shell=True)
+      sleep (30)
+      print "活動時間外なので発声・動作しません"
 
   except KeyboardInterrupt: # CTRL+Cで終了
     debug_message('keyboard interrupted')
-    client.close()
     bez.moveCenter()
     bez.stop()
     sys.exit(0)
