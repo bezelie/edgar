@@ -13,7 +13,7 @@ import json                     #
 bus = smbus.SMBus(1)
 
 # 変数
-jsonFile = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
+jsonFile = "/home/pi/bezelie/data_chat.json"        # 設定ファイル
 
 class Control(object): # クラスの定義
 

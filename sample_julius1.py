@@ -16,8 +16,8 @@ import csv                         # CSVファイルを扱うモジュール
 import sys                         # python終了sys.exit()のために必要
 import re                          # 正規表現モジュール
 
-jsonFile = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
-ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh"     # 音声合成
+jsonFile = "/home/pi/bezelie/data_chat.json"          # 設定ファイル
+ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh" # 音声合成
 
 # 設定ファイルの読み込み
 f = open (jsonFile,'r')

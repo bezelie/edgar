@@ -24,10 +24,10 @@ import picamera                    #
 import picamera.array              # 
 import cv2                         # openCV
 
-csvFile   = "/home/pi/bezelie/edgar/chatDialog.csv"        # 対話リスト
-jsonFile  = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
-ttsFile   = "/home/pi/bezelie/edgar/exec_openJTalk.sh"     # 音声合成
-debugFile = "/home/pi/bezelie/edgar/debug.txt"             # debug用
+csvFile   = "/home/pi/bezelie/chatDialog.csv"          # 対話リスト
+jsonFile  = "/home/pi/bezelie/data_chat.json"          # 設定ファイル
+ttsFile   = "/home/pi/bezelie/edgar/exec_openJTalk.sh" # 音声合成
+debugFile = "/home/pi/bezelie/debug.txt"               # debug用
 
 # 設定ファイルの読み込み
 f = open (jsonFile,'r')

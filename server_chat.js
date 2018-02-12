@@ -123,16 +123,16 @@ var routes = { // パスごとの表示内容を連想配列に格納
         "content":test}
 };
 // 変数宣言
-var file_chatIntent            = __dirname+"/chatIntent.csv";
-var file_chatEntity            = __dirname+"/chatEntity.csv";
-var file_chatDialog            = __dirname+"/chatDialog.csv";
-var file_chatEntity_tsv        = __dirname+"/chatEntity.tsv";
-var file_chatEntity_dic        = __dirname+"/chatEntity.dic";
+var file_chatIntent            = "/home/pi/bezelie/chatIntent.csv";
+var file_chatEntity            = "/home/pi/bezelie/chatEntity.csv";
+var file_chatDialog            = "/home/pi/bezelie/chatDialog.csv";
+var file_chatEntity_tsv        = "/home/pi/bezelie/chatEntity.tsv";
+var file_chatEntity_dic        = "/home/pi/bezelie/chatEntity.dic";
+var file_data_chat             = "/home/pi/bezelie/data_chat.json"
+var file_debug                 = "/home/pi/bezelie/debug.txt"
 var file_restart_app           = __dirname+"/restart_app.sh";
 var file_exec_talk             = __dirname+"/exec_openJTalk.sh"
 var file_setting_disableServer = __dirname+"/setting_disableServer.sh";
-var file_data_chat             = __dirname+"/data_chat.json"
-var file_debug                 = __dirname+"/debug.txt"
 var errorMsg = ""; // これが空欄のときはエラー無し
 var posts = "";    // ブラウザからPOSTで送られてきたデータ
 var intent = "";   // 今回選択されたintent（単数）
