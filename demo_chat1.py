@@ -216,6 +216,7 @@ def main():
     subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
     subprocess.call("sh "+ttsFile+" "+u"ぼく"+name, shell=True)
     bez.stop()
+    sleep (1)
     subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感受性
     data = ""
     # subprocess.call('sh exec_camera.sh', shell=True)            # カメラの映像をディスプレイに表示
