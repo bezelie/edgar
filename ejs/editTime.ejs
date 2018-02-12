@@ -58,7 +58,7 @@ if (obj_config.data1[0].alarmKind == 'mild'){alarmKind0 = selected}else{alarmKin
         </td>
     </tr>
     <tr align="center">
-        <td>時刻</td><td  align="center"><input type="time" min="00:00" max="12:00" step="300" name="alarmTime" 
+        <td>時刻</td><td  align="center"><input type="time" min="00:00" max="23:59" step="60" name="alarmTime" 
         value=<%= obj_config.data1[0].alarmTime %> style="font-size:16px"></td>
     </tr>
     <tr align="center">
@@ -75,20 +75,20 @@ if (obj_config.data1[0].alarmKind == 'mild'){alarmKind0 = selected}else{alarmKin
 -->
     <tr align="center">
         <th rowspan=2>活動時間１</th>
-        <td>開始</td><td align="center"><input type="time" min="00:00" max="23:30" step="600" name="awake1Start" 
+        <td>開始</td><td align="center"><input type="time" min="00:00" max="23:58" step="60" name="awake1Start" 
         value=<%= obj_config.data1[0].awake1Start %> style="font-size:16px"></td>
     </tr>
     <tr align="center">
-        <td>終了</td><td align="center"><input type="time" min="00:30" max="24:00" step="600" name="awake1End" 
+        <td>終了</td><td align="center"><input type="time" min="00:01" max="23:59" step="60" name="awake1End" 
         value=<%= obj_config.data1[0].awake1End %> style="font-size:16px"></td>
     </tr>
     <tr align="center">
         <th rowspan=2>活動時間２</th>
-        <td>開始</td><td align="center"><input type="time" min="00:30" max="23:00" step="600" name="awake2Start" 
+        <td>開始</td><td align="center"><input type="time" min="00:00" max="23:58" step="60" name="awake2Start" 
         value=<%= obj_config.data1[0].awake2Start %> style="font-size:16px"></td>
     </tr>
     <tr align="center">
-        <td>終了</td><td align="center"><input type="time" min="00:00" max="24:00" step="600" name="awake2End" 
+        <td>終了</td><td align="center"><input type="time" min="00:01" max="23:59" step="60" name="awake2End" 
         value=<%= obj_config.data1[0].awake2End %> style="font-size:16px"></td>
     </tr>
     <tr align="center">

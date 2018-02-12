@@ -24,9 +24,10 @@ import picamera                    #
 import picamera.array              # 
 import cv2                         # openCV
 
-csvFile  = "/home/pi/bezelie/edgar/chatDialog.csv"        # 対話リスト
-jsonFile = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
-ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh"     # 音声合成
+csvFile   = "/home/pi/bezelie/edgar/chatDialog.csv"        # 対話リスト
+jsonFile  = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
+ttsFile   = "/home/pi/bezelie/edgar/exec_openJTalk.sh"     # 音声合成
+debugFile = "/home/pi/bezelie/edgar/debug.txt"             # debug用
 
 # 設定ファイルの読み込み
 f = open (jsonFile,'r')
@@ -134,8 +135,6 @@ def replyMessage(keyWord):        # 対話
       maxNum = i[2]               # 
       ansNum = i[3]               #
 
-  debug_message('50: Answer Selected')
-
   # 発話
   subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)  # 自分の声を認識してしまわないようにマイクを切る
   is_playing = True
@@ -161,7 +160,6 @@ def replyMessage(keyWord):        # 対話
   alarmStop = True # 対話が発生したらアラームを止める
   subprocess.call('sudo amixer -q sset Mic '+mic+' -c 0', shell=True)  # マイク感受性を元に戻す
   is_playing = False
-  debug_message('60: Reply Finished')
 
 def socket_buffer_clear():
   while True:
@@ -174,27 +172,23 @@ def socket_buffer_clear():
 
 def parse_recogout(data):
   data = re.search(r'WORD\S+', data)    # \s
-  debug_message('30: Got WORD')
   keyWord = data.group().replace("WORD=","").replace("\"","")
-  debug_message('40: keyword Parsed= ' + keyWord)
   replyMessage(keyWord)
-  debug_message('70')
   socket_buffer_clear()
-  debug_message('80')
 
 def debug_message(message):
   print message
-#　pass
 #  writeFile(message)
+#　pass
 #  sys.stdout.write(message)
 
 def writeFile(text): # デバッグファイル出力機能
-  f = open ('debug.txt', 'r')
+  f = open (debugFile,'r')
   textBefore = ""
   for row in f:
     textBefore = textBefore + row
   f.close()
-  f = open ('debug.txt', 'w')
+  f = open (debugFile,'w')
   f.write(textBefore + text + "\n")
   f.close()
 
@@ -226,7 +220,7 @@ if mode == True:                   # 音声認識モードの場合の処理
       break
     except socket.error, e:
       # print 'failed socket connect. retry'
-      pass
+      sleep (0.5)
   if enabled_julius == False:
     print 'Could not find Julius'
     sys.exit(1)
@@ -250,9 +244,7 @@ def main():
       socket_buffer_clear()
       while True:
         if "</RECOGOUT>\n." in data:  # RECOGOUTツリーの最終行を見つけたら以下の処理を行う
-          debug_message('20: Recognized')
           parse_recogout(data)
-          debug_message('90: Session End')
           data = ""  # 認識終了したのでデータをリセットする
         else:
           debug_message('10: Listening...')
@@ -272,7 +264,6 @@ def main():
           # camera.resolution = (1920, 1080)                      # Display Resolution
           camera.hflip = True                                     # Vertical Flip 
           camera.vflip = True                                     # Horizontal Flip
-
           while True:
             camera.capture(stream, 'bgr', use_video_port=True)    # Capture the Video Stream
             gray = cv2.cvtColor(stream.array, cv2.COLOR_BGR2GRAY) # Convert BGR to Grayscale
@@ -281,7 +272,6 @@ def main():
               minNeighbors=3,                                     # 3 - 6 : the smaller the more easy to detect
               minSize=(100,120),                                   # Minimam face size 
               maxSize=(640,480))                                  # Maximam face size
-
             if len(facerect) > 0:
               for rect in facerect:
                 cv2.rectangle(stream.array,                       # Draw a red rectangle at face place 
@@ -289,26 +279,20 @@ def main():
                   tuple(rect[0:2]+rect[2:4]),                     # Lower Right
                   (0,0,255), thickness=2)                         # Color and thickness
               replyMessage(u"顔認識")
-
             # cv2.imshow('frame', stream.array)                     # Display the stream
-
             if cv2.waitKey(1) & 0xFF == ord('q'):                 # Quit operation
               break
-
             stream.seek(0)                                        # Reset the stream
             stream.truncate()
-            
             stageAngle = stageAngle + stageDelta            
             if stageAngle > 30 or stageAngle < -30:
               stageDelta = stageDelta*(-1)
             bez.moveStage(stageAngle,stageSpeed)
-
           cv2.destroyAllWindows()
 
   except KeyboardInterrupt: # CTRL+Cで終了
     debug_message('keyboard interrupted')
-    if mode == True:           # 音声認識モード
-      client.close()
+    client.close()
     bez.moveCenter()
     bez.stop()
     GPIO.cleanup()                     # ポートをクリア
