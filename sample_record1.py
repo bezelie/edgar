@@ -10,16 +10,16 @@ import pyaudio            # オーディオI/Oライブラリ
 import wave               # wavファイルを読み書きするモジュール
 
 # 音声合成シェルスクリプトのファイル名の指定
-ttsFile = "exec_openJTalk.sh"
+ttsFile = "/home/pi/bezelie/edgar/exec_openJTalk.sh"
 
 # Pyaudio
 RATE = 44100              #サンプル周波数 取り込み１回分の時間
-CHUNK = 2**12             #取り込み１回分のデータサイズ 512
+CHUNK = 2**12             #取り込み１回分のデータサイズ
 FORMAT = pyaudio.paInt16  #データフォーマットは int16型
 CHANNELS = 1              #モノラル
 RECORD_SECONDS = 2        #録音する時間の長さ
 DEVICE_INDEX = 0
-WAVE_OUTPUT_FILENAME = "test.wav"
+WAVE_OUTPUT_FILENAME = "/home/pi/bezelie/test.wav"
 audio = pyaudio.PyAudio() #pyaudioのインスタンスaudioを生成
 
 # メインループ
@@ -52,7 +52,6 @@ def main():
       print ("録音完了")
       subprocess.call('aplay -D plughw:1 "'+ WAVE_OUTPUT_FILENAME +'"', shell=True)
       sleep (2)
-
   except KeyboardInterrupt:
     print " 終了しました"
     audio.terminate()                # インスタンスaudioを終了

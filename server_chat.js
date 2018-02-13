@@ -30,7 +30,6 @@ var os   = require('os');
                             //    os.networkInterfaces();
 var sleep = require('sleep');
                             // ウェイト処理用モジュール
-
 // ejsファイルの読み込み
 var template            = fs.readFileSync(__dirname + '/ejs/template.ejs', 'utf-8');
 var top                 = fs.readFileSync(__dirname + '/ejs/top.ejs', 'utf-8');
@@ -247,9 +246,6 @@ function routing(req, res){ // requestイベントが発生したら実行され
             exec(COMMAND, function(error, stdout, stderr) {
               var COMMAND = "bash "+file_restart_app;
               exec(COMMAND, function(error, stdout, stderr) {
-                debug('app done \n');
-                debug('stdout: '+stdout+'\n');
-                debug('stderr: '+stderr+'\n');
               }); // end of exec
             }); // end of exec
             debug('restart function end \n');
@@ -267,9 +263,6 @@ function routing(req, res){ // requestイベントが発生したら実行され
             exec(COMMAND, function(error, stdout, stderr) {
               var COMMAND = "sh "+file_setting_chatMode;
               exec(COMMAND, function(error, stdout, stderr) {
-                var COMMAND = 'sudo reboot';
-                exec(COMMAND, function(error, stdout, stderr) {
-                }); // end of exec
               }); // end of exec
             }); // end of exec
         } else if (url_parts.pathname === "/faceMode"){ // 顔認識モードで再起動
@@ -278,20 +271,14 @@ function routing(req, res){ // requestイベントが発生したら実行され
             exec(COMMAND, function(error, stdout, stderr) {
               var COMMAND = "sh "+file_setting_faceMode;
               exec(COMMAND, function(error, stdout, stderr) {
-                var COMMAND = 'sudo reboot';
-                exec(COMMAND, function(error, stdout, stderr) {
-                }); // end of exec
               }); // end of exec
             }); // end of exec
         } else if (url_parts.pathname === "/disableServer"){ // サーバーを無効化して再起動
             pageWrite(res);
-            var COMMAND = "sh "+file_exec_talk+" "+"プログラムを終了し、アクセスポイント化を無効化して再起動します";
+            var COMMAND = "sh "+file_exec_talk+" "+"プログラムを停止し、アクセスポイント化を無効化して再起動します";
             exec(COMMAND, function(error, stdout, stderr) {
               var COMMAND = "sh "+file_setting_disableServer;
               exec(COMMAND, function(error, stdout, stderr) {
-                var COMMAND = 'sudo reboot';
-                exec(COMMAND, function(error, stdout, stderr) {
-                }); // end of exec
               }); // end of exec
             }); // end of exec
         } else {
@@ -465,9 +452,7 @@ function routing(req, res){ // requestイベントが発生したら実行され
 // ---------------------------------------------------------------------------------------------------------
 // IPアドレスの設定
 var host = getLocalAddress().ipv4[0].address; // 現在のIPアドレスを取得する。
-// var host = 'localhost'         //
-// var host = '10.0.0.1'          // 
-debug('server_editChat.js start \n');
+debug('server_chat.js start \n');
 debug(host+'\n');
 
 // サーバーの起動
@@ -476,9 +461,4 @@ var server = http.createServer(); // http.serverクラスのインスタンス�
 server.on('request', routing);    // serverでrequestイベントが発生した場合のコールバック関数を登録
 var port = 3000;                  // portは1024以上の数字なら何でもよい。
 server.listen(port, host)         // サーバーを待ち受け状態にする。
-// var COMMAND = "sh "+file_exec_talk+" "+host;
-// exec(COMMAND, function(error, stdout, stderr) {
-//   sleep.sleep(6);
-//   server.listen(port, host)         // サーバーを待ち受け状態にする。
-// });
 console.log ("server is listening at "+host+":"+port);

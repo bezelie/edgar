@@ -8,7 +8,7 @@ from time import sleep                # ウェイト処理
 import subprocess                     # 外部プロセスを実行するモジュール
 
 # 変数
-ttsFile = "exec_openJTalk.sh"         # 発話シェルスクリプトのファイル名
+ttsFile = "/home/pi/bezelie/edgar/exec_openJTalk.sh" # 発話シェルスクリプトのファイル名
 
 # メインループ
 def main():

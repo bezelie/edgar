@@ -4,5 +4,4 @@ ALSADEV="plughw:0,0" /usr/local/bin/julius -C /home/pi/bezelie/edgar/juliusNL.jc
 echo "Julius's Process ID = "$!
 # /dev/nullはlinuxの特殊ファイルで、何も出力したくない時に指定する。
 # $! = シェルが最後に実行したバックグラウンドプロセスのID
-sleep 3 # juliusが立ち上がる前にアクセスしようとするとエラーになるので数秒待つ
 exit 0

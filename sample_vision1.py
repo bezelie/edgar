@@ -12,7 +12,7 @@ import bezelie
 
 # Variables
 GOOGLE_CLOUD_VISION_API_URL = 'https://vision.googleapis.com/v1/images:annotate?key='
-API_KEY = 'AIzaSyDYM3UustOL3oQdQf1YhOK1HkeMImOpwo4'  # Google Cloud Platform Consoleで登録したAPIキー
+API_KEY = ''  # Google Cloud Platform Consoleで登録したAPIキー
 jpgFile = '/home/pi/Pictures/capture.jpg'  # キャプチャー画像ファイル
 
 # Functions
@@ -60,6 +60,8 @@ def main():
           try:
             answer = result['responses'][0]['labelAnnotations'][i]['description'].encode('utf-8')
             print (answer)
+            subprocess.call('flite -voice "kal16" -t "'+ answer +'"', shell=True)
+            # Other English Voices :kal awb_time kal16 awb rms slt
           except:
             print ("no answer")
         camera.start_preview()

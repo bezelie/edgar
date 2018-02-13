@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# 音声対話デモ
+# julius音声認識サンプル
 # for Bezelie Edgar
 # for Raspberry Pi
 # by Jun Toyoda (Team Bezelie)
@@ -16,7 +16,7 @@ import csv                         # CSVファイルを扱うモジュール
 import sys                         # python終了sys.exit()のために必要
 import re                          # 正規表現モジュール
 
-jsonFile = "/home/pi/bezelie/data_chat.json"          # 設定ファイル
+jsonFile = "/home/pi/bezelie/edgar/data_chat.json"    # 設定ファイル
 ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh" # 音声合成
 
 # 設定ファイルの読み込み

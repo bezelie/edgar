@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Bezelie Sample Code : Face Recognition Test
-import picamera                        # カメラモジュール
-import picamera.array                  # 動画ストリーミングモジュール
+import picamera                        # カメラ用モジュール
+import picamera.array                  # カメラ用モジュール
 import cv2                             # Open CVモジュール    
 import bezelie                         # べゼリー専用サーボ制御モジュール
 

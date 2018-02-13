@@ -31,7 +31,7 @@ def main():
           head = -10
         bez.moveHead (head)
   except KeyboardInterrupt:
-    print " Interrupted by Keyboard"
+    print " 終了します"
 
 if __name__ == "__main__":
     main()

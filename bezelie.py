@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 # Bezelie Python Module for Raspberry Pi
 # べゼリー専用モジュール
-from random import randint      # 
-from time import sleep          #
-import RPi.GPIO as GPIO         #
-import smbus                    # for I2C
-import math                     # 
-import threading                # 
-import json                     #
+
+from random import randint         # 乱数の発生
+from time import sleep             # ウェイト処理
+import RPi.GPIO as GPIO            # GPIO
+import smbus                       # I2C
+import math                        # 計算用
+import threading                   # マルチスレッド処理
+import json                        # jsonファイルを扱うモジュール
 
 bus = smbus.SMBus(1)
 
@@ -74,8 +75,8 @@ class Control(object): # クラスの定義
         sleep(0.005)
         bus.write_byte_data(self.address_pca9685, 0x00, oldmode | 0xa1)
       except:
-        pass
-        # print "Please connect PCA9685 to RaspberryPi"
+        print "サーボドライバーボードを接続してください"
+        # pass
 
     def resetPCA9685(self):
         bus.write_byte_data(self.address_pca9685, 0x00, 0x00)
@@ -152,8 +153,6 @@ class Control(object): # クラスの定義
             self.moveHead(10)
             self.moveBack(5)
             self.moveBack(-5)
-            # self.moveBack(10)
-            # self.moveBack(-10)
             self.moveBack(0)
             sleep (time)
             self.moveHead(0)  
@@ -161,8 +160,6 @@ class Control(object): # クラスの定義
     def actNod(self, time=0.2): # うなづき
         while not self.stop_event.is_set():
             self.moveHead(-10)
-            # self.moveHead(10)  
-            # self.moveHead(-10)
             sleep (time)
             self.moveHead(0)  
 
@@ -176,18 +173,13 @@ class Control(object): # クラスの定義
 
     def actAround(self, time=0.2): # 見回し
         while not self.stop_event.is_set():
-            # self.moveHead(20)
             self.moveStage(20)
             self.moveStage(-20)
             self.moveStage(0)
-            sleep (time)
-            self.moveHead(0)
 
     def actUp(self, time=0.2): # 見上げ
         while not self.stop_event.is_set():
             self.moveHead(30)
-            # self.moveHead(-10)
-            # self.moveHead(30)
             sleep (time)
             self.moveHead(0)
 
@@ -195,9 +187,7 @@ class Control(object): # クラスの定義
         while not self.stop_event.is_set():
             self.moveBack(20)
             self.moveStage(10)
-            # self.moveBack(-20)
             self.moveStage(-10)
-            # self.moveBack(10)
             self.moveStage(0)
             self.moveBack(0)
 
@@ -214,7 +204,6 @@ class Control(object): # クラスの定義
 # Centering Servo Motors
 if __name__ == "__main__":  # Do only when this is done as a script
   bez = Control()               # べゼリー操作インスタンスの生成
-  jsonFile = "data_chat.json"        # 設定ファイル
   f = open (jsonFile,'r')
   jDict = json.load(f)
   bez.headTrim = int(jDict['data2'][0]['head'])

@@ -9,19 +9,15 @@
 from datetime import datetime      # 現在時刻取得
 from random import randint         # 乱数の発生
 from time import sleep             # ウェイト処理
-import RPi.GPIO as GPIO
-import subprocess                  #
+import subprocess                  # 外部プロセスを実行するモジュール
 import threading                   # マルチスレッド処理
-import traceback                   # デバッグ用
-import bezelie                     # べゼリー専用モジュール
 import socket                      # ソケット通信モジュール
 import select                      # 待機モジュール
-import json                        #
-import csv                         #
-import sys                         # 
-import re                          # 正規表現
-import picamera                    # 
-import picamera.array              # 
+import json                        # jsonファイルを扱うモジュール
+import csv                         # CSVファイルを扱うモジュール
+import sys                         # python終了sys.exit()のために必要
+import re                          # 正規表現モジュール
+import bezelie                     # べゼリー専用サーボ制御モジュール
 
 csvFile   = "/home/pi/bezelie/chatDialog.csv"          # 対話リスト
 jsonFile  = "/home/pi/bezelie/edgar/data_chat.json"    # 設定ファイル
@@ -74,16 +70,11 @@ def alarm():
   alarmOn = jDict['data1'][0]['alarmOn']
   alarmTime = jDict['data1'][0]['alarmTime']
   alarmKind = jDict['data1'][0]['alarmKind']
-  # alarmVol = jDict['data1'][0]['alarmVol']
   now = datetime.now()
-  # print 'Time: '+str(now.hour)+':'+str(now.minute)
-
-  #if True: # アラーム動作のチェック用
   if int(now.hour) == int(alarmTime[0:2]) and int(now.minute) == int(alarmTime[3:5]):
     if alarmOn == "true":
       if alarmStop == False:
-        # print 'アラームの時間です'
-        subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)  #
+        subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True) 
         if alarmKind == 'mild':
           bez.moveAct('happy')
           subprocess.call("sh "+ttsFile+" "+"朝ですよ", shell=True)
@@ -93,13 +84,9 @@ def alarm():
           subprocess.call("sh "+ttsFile+" "+"朝だよ起きて起きてー", shell=True)
           bez.stop()
         sleep (muteTime)
-        subprocess.call('sudo amixer -q sset Mic '+mic+' -c 0', shell=True)  #
+        subprocess.call('sudo amixer -q sset Mic '+mic+' -c 0', shell=True)
       else:
-        # print '_'
         alarmStop = False
-    # else:
-      # print 'アラームの時間ですが、アラームはオフになっています'
-
   t=threading.Timer(20,alarm) # ｎ秒後にまたスレッドを起動する
   t.setDaemon(True)           # メインスレッドが終了したら終了させる
   t.start()
@@ -122,10 +109,10 @@ def replyMessage(keyWord):        # 対話
       data1.append(i+[j]+[index])
 
   maxNum = 0                      # 複数の候補からランダムで選出。data1から欄数値が最大なものを選ぶ
-  for i in data1:                 # 
-    if i[2] > maxNum:             # 
-      maxNum = i[2]               # 
-      ansNum = i[3]               #
+  for i in data1:                 
+    if i[2] > maxNum:              
+      maxNum = i[2]                
+      ansNum = i[3]               
 
   # 発話
   subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)  # 自分の声を認識してしまわないようにマイクを切る
@@ -134,8 +121,8 @@ def replyMessage(keyWord):        # 対話
   # 設定ファイルの読み込み
   f = open (jsonFile,'r')
   jDict = json.load(f)
-  mic = jDict['data0'][0]['mic']         # マイク感度の設定。62が最大値。
-  vol = jDict['data0'][0]['vol']         # 
+  mic = jDict['data0'][0]['mic']         # マイク感度の設定。
+  vol = jDict['data0'][0]['vol']         # スピーカーボリューム
 
   if timeCheck(): # 活動時間だったら会話する
     bez.moveRnd()
@@ -147,7 +134,6 @@ def replyMessage(keyWord):        # 対話
     subprocess.call("sh "+ttsFile+" "+"活動時間外です", shell=True)
     sleep (5)
     subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True) # スピーカー音量
-  #  print "活動時間外なので発声・動作しません"
 
   alarmStop = True # 対話が発生したらアラームを止める
   subprocess.call('sudo amixer -q sset Mic '+mic+' -c 0', shell=True)  # マイク感受性を元に戻す
@@ -156,25 +142,24 @@ def replyMessage(keyWord):        # 対話
 def socket_buffer_clear():
   while True:
     rlist, _, _ = select.select([client], [], [], 1)
-
     if len(rlist) > 0: 
       dummy_buffer = client.recv(bufferSize)
     else:
       break
 
-def parse_recogout(data):
-  data = re.search(r'WORD\S+', data)    # \s
-  keyWord = data.group().replace("WORD=","").replace("\"","")
+def parse_recogout(data):                                     # データからキーワードの抽出
+  data = re.search(r'WORD\S+', data)                          # dataからWORD\sで始まる行を抽出
+  keyWord = data.group().replace("WORD=","").replace("\"","") # dataからキーワード以外を削除
   replyMessage(keyWord)
   socket_buffer_clear()
 
 def debug_message(message):
   print message
 #  writeFile(message)
-#　pass
 #  sys.stdout.write(message)
+#　pass
 
-def writeFile(text): # デバッグファイル出力機能
+def writeFile(text):                # デバッグファイル出力機能
   f = open (debugFile,'r')
   textBefore = ""
   for row in f:
@@ -185,8 +170,8 @@ def writeFile(text): # デバッグファイル出力機能
   f.close()
 
 # サーボの初期化
-bez = bezelie.Control()                 # べゼリー操作インスタンスの生成
-bez.moveCenter()                        # サーボの回転位置をトリム値に合わせる
+bez = bezelie.Control() # べゼリー操作インスタンスの生成
+bez.moveCenter()        # サーボの回転位置をトリム値に合わせる
 
 # TCPクライアントを作成しJuliusサーバーに接続する
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -194,14 +179,13 @@ enabled_julius = False
 for count in range(3):
   try:
     client.connect(('localhost', 10500))
-    # client.connect(('10.0.0.1', 10500))  # Juliusサーバーに接続
     enabled_julius = True
     break
   except socket.error, e:
-    # print 'failed socket connect. retry'
+    print 'failed socket connect. retry'
     sleep (0.5)
 if enabled_julius == False:
-  print 'Could not find Julius'
+  print 'Juliusが見つかりませんでした'
   sys.exit(1)
 
 # メインループ
@@ -212,12 +196,12 @@ def main():
   try:
     subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
     bez.moveAct('happy')
-    subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイク感受性
+    subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイクをオフ
     subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
     subprocess.call("sh "+ttsFile+" "+u"ぼく"+name, shell=True)
     bez.stop()
     sleep (1)
-    subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感受性
+    subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク再開
     data = ""
     # subprocess.call('sh exec_camera.sh', shell=True)            # カメラの映像をディスプレイに表示
     socket_buffer_clear()
@@ -228,10 +212,8 @@ def main():
       else:
         debug_message('10: Listening...')
         data = data + client.recv(bufferSize)  # Juliusサーバーから受信
-        # /RECOGOUTに達するまで受信データを追加していく
-
   except KeyboardInterrupt: # CTRL+Cで終了
-    debug_message('keyboard interrupted')
+    debug_message(' 終了しました')
     client.close()
     bez.moveCenter()
     bez.stop()

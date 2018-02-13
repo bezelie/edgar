@@ -9,15 +9,14 @@
 from datetime import datetime      # 現在時刻取得
 from random import randint         # 乱数の発生
 from time import sleep             # ウェイト処理
-import subprocess                  #
-import traceback                   # デバッグ用
-import bezelie                     # べゼリー専用モジュール
-import json                        #
-import csv                         #
-import sys                         # 
-import picamera                    # 
-import picamera.array              # 
-import cv2                         # openCV
+import subprocess                  # 外部プロセスを実行するモジュール
+import json                        # jsonファイルを扱うモジュール
+import csv                         # CSVファイルを扱うモジュール
+import sys                         # python終了sys.exit()のために必要
+import picamera                    # カメラ用モジュール
+import picamera.array              # カメラ用モジュール
+import cv2                         # Open CVモジュール    
+import bezelie                     # べゼリー専用サーボ制御モジュール
 
 csvFile   = "/home/pi/bezelie/chatDialog.csv"          # 対話リスト
 jsonFile  = "/home/pi/bezelie/edgar/data_chat.json"    # 設定ファイル
@@ -37,7 +36,7 @@ alarmStop = False   # アラームのスヌーズ機能（非搭載）
 is_playing = False  # 再生中か否かのフラグ
 waitTime = 5        # autoモードでの会話の間隔
 
-# openCV
+# OpenCV
 cascade_path =  "/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml" # 顔認識xml
 cascade = cv2.CascadeClassifier(cascade_path)
 
@@ -84,16 +83,16 @@ def replyMessage(keyWord):        # 対話
       data1.append(i+[j]+[index])
 
   maxNum = 0                      # 複数の候補からランダムで選出。data1から欄数値が最大なものを選ぶ
-  for i in data1:                 # 
-    if i[2] > maxNum:             # 
-      maxNum = i[2]               # 
-      ansNum = i[3]               #
+  for i in data1:                 
+    if i[2] > maxNum:              
+      maxNum = i[2]                
+      ansNum = i[3]               
 
   # 設定ファイルの読み込み
   f = open (jsonFile,'r')
   jDict = json.load(f)
-  mic = jDict['data0'][0]['mic']         # マイク感度の設定。62が最大値。
-  vol = jDict['data0'][0]['vol']         # 
+  mic = jDict['data0'][0]['mic']         # マイク感度の設定。
+  vol = jDict['data0'][0]['vol']         # スピーカー音量。
 
   bez.moveRnd()
   subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True) # スピーカー音量
@@ -123,21 +122,20 @@ bez.moveCenter()                        # サーボの回転位置をトリム�
 # メインループ
 def main():
   try:
-    debug_message('face detection mode')
     subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
     subprocess.call("sh "+ttsFile+" "+u"顔認識モード", shell=True)
     stageAngle = 0           # ステージの初期角度
     stageDelta = 5           # ループごとにステージを回転させる角度
     stageSpeed = 8           # ループごとにステージを回転させる速度
-    if timeCheck(): # 活動時間だったら会話する
-      with picamera.PiCamera() as camera:                         # Open Pi-Camera as camera
-        with picamera.array.PiRGBArray(camera) as stream:         # Open Video Stream from Pi-Camera as stream
-          camera.resolution = (640, 480)                          # Display Resolution
-          # camera.resolution = (1280, 720)                       # Display Resolution
-          # camera.resolution = (1920, 1080)                      # Display Resolution
-          camera.hflip = True                                     # Vertical Flip 
-          camera.vflip = True                                     # Horizontal Flip
-          while True:
+    with picamera.PiCamera() as camera:                         # Open Pi-Camera as camera
+      with picamera.array.PiRGBArray(camera) as stream:         # Open Video Stream from Pi-Camera as stream
+        camera.resolution = (640, 480)                          # Display Resolution
+        # camera.resolution = (1280, 720)                       # Display Resolution
+        # camera.resolution = (1920, 1080)                      # Display Resolution
+        camera.hflip = True                                     # Vertical Flip 
+        camera.vflip = True                                     # Horizontal Flip
+        while True:
+          if timeCheck(): # 活動時間だったら動く
             camera.capture(stream, 'bgr', use_video_port=True)    # Capture the Video Stream
             gray = cv2.cvtColor(stream.array, cv2.COLOR_BGR2GRAY) # Convert BGR to Grayscale
             facerect = cascade.detectMultiScale(gray,             # Find face from gray
@@ -152,7 +150,7 @@ def main():
                   tuple(rect[0:2]+rect[2:4]),                     # Lower Right
                   (0,0,255), thickness=2)                         # Color and thickness
               replyMessage(u"顔認識")
-            # cv2.imshow('frame', stream.array)                     # Display the stream
+            # cv2.imshow('frame', stream.array)                     # 画面に表示したい場合はコメント外してください
             if cv2.waitKey(1) & 0xFF == ord('q'):                 # Quit operation
               break
             stream.seek(0)                                        # Reset the stream
@@ -161,13 +159,13 @@ def main():
             if stageAngle > 30 or stageAngle < -30:
               stageDelta = stageDelta*(-1)
             bez.moveStage(stageAngle,stageSpeed)
-          cv2.destroyAllWindows()
-
-    else:           # 活動時間外は動作しない
-      subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)  # スピーカー音量
-      subprocess.call("sh "+ttsFile+" "+"活動時間外です", shell=True)
-      sleep (30)
-      print "活動時間外なので発声・動作しません"
+          else:           # 活動時間外は動作しない
+            subprocess.call('amixer cset numid=1 60% -q', shell=True)      # スピーカー音量を調整
+            subprocess.call("sh "+ttsFile+" "+"活動時間外です", shell=True)
+            print "活動時間外なので発声・動作しません"
+            sleep (600)   # 10分待機
+            subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True) # スピーカー音量を戻す
+        cv2.destroyAllWindows()
 
   except KeyboardInterrupt: # CTRL+Cで終了
     debug_message('keyboard interrupted')
