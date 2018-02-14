@@ -1,6 +1,6 @@
 [Unit]
 Description=starting julius
-After=syslog.target sockets.target network.target network-online.target
+After=autoStart_node.service network-online.target
 ConditionPathExists=/opt/bezelie/bin
 
 [Service]

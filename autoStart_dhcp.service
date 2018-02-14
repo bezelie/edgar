@@ -1,6 +1,6 @@
 [Unit]
 Description = starting dhcp service
-After=syslog.target network.target
+After=network-online.target
 ConditionPathExists=/opt/bezelie/bin
 
 [Service]

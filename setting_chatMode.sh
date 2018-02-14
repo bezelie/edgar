@@ -24,9 +24,9 @@ sudo cp autoStart_python.service /etc/systemd/system/
 sudo cp autoStart_julius.service /etc/systemd/system/
 sudo cp autoStart_node.service /etc/systemd/system/
 sudo cp autoStart_dhcp.service /etc/systemd/system/
+sudo systemctl daemon-reload
 sudo systemctl enable autoStart_python.service
 sudo systemctl enable autoStart_julius.service
 sudo systemctl enable autoStart_node.service
 sudo systemctl enable autoStart_dhcp.service
-sudo systemctl daemon-reload
 sudo reboot

@@ -196,7 +196,7 @@ def main():
   try:
     subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
     bez.moveAct('happy')
-    subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイクをオフ
+    #subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイクをオフ
     subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
     subprocess.call("sh "+ttsFile+" "+u"ぼく"+name, shell=True)
     bez.stop()
