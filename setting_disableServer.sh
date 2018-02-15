@@ -1,7 +1,5 @@
 #!/bin/bash
 # ラズパイのアクセスポイント化を解除し、wifiに接続する設定にする
-SCRIPT_DIR=`dirname $0`
-cd $SCRIPT_DIR
 # サービス終了
 sudo service isc-dhcp-server stop
 # DHCPサーバ無効化

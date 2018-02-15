@@ -1,7 +1,5 @@
 #!/bin/bash
 # 音声認識モードで再起動
-SCRIPT_DIR=`dirname $0`
-cd $SCRIPT_DIR
 # wlan0をアクセスポイントにする
 sudo cp config/interfaces_changed /etc/network/interfaces
 # IPアドレス固定 wlan0に固定IPアドレスを割り振る

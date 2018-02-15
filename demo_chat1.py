@@ -172,18 +172,20 @@ def writeFile(text):                # デバッグファイル出力機能
 # サーボの初期化
 bez = bezelie.Control() # べゼリー操作インスタンスの生成
 bez.moveCenter()        # サーボの回転位置をトリム値に合わせる
+sleep (1)
 
 # TCPクライアントを作成しJuliusサーバーに接続する
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 enabled_julius = False
 for count in range(3):
+  sleep (1)
   try:
     client.connect(('localhost', 10500))
     enabled_julius = True
     break
   except socket.error, e:
     print 'failed socket connect. retry'
-    sleep (0.5)
+    sleep (1)
 if enabled_julius == False:
   print 'Juliusが見つかりませんでした'
   sys.exit(1)
@@ -196,11 +198,10 @@ def main():
   try:
     subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
     bez.moveAct('happy')
-    #subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイクをオフ
+    subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイクをオフ
     subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
     subprocess.call("sh "+ttsFile+" "+u"ぼく"+name, shell=True)
     bez.stop()
-    sleep (1)
     subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク再開
     data = ""
     # subprocess.call('sh exec_camera.sh', shell=True)            # カメラの映像をディスプレイに表示
