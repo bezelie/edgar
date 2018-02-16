@@ -1,5 +1,6 @@
 #!/bin/bash
 # 顔認識モードで再起動
+cd /home/pi/bezelie/edgar
 # wlan0をアクセスポイントにする
 sudo cp config/interfaces_changed /etc/network/interfaces
 # IPアドレス固定 wlan0に固定IPアドレスを割り振る

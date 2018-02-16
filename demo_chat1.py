@@ -154,8 +154,10 @@ def parse_recogout(data):                                     # データから�
   socket_buffer_clear()
 
 def debug_message(message):
+  t = datetime.now()
+  message = str(t.minute)+":"+str(t.second)+":"+message
   print message
-#  writeFile(message)
+  writeFile(message)
 #  sys.stdout.write(message)
 #　pass
 
@@ -170,48 +172,54 @@ def writeFile(text):                # デバッグファイル出力機能
   f.close()
 
 # サーボの初期化
+debug_message(' 1')
 bez = bezelie.Control() # べゼリー操作インスタンスの生成
 bez.moveCenter()        # サーボの回転位置をトリム値に合わせる
-sleep (1)
-
-# TCPクライアントを作成しJuliusサーバーに接続する
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-enabled_julius = False
-for count in range(3):
-  sleep (1)
-  try:
-    client.connect(('localhost', 10500))
-    enabled_julius = True
-    break
-  except socket.error, e:
-    print 'failed socket connect. retry'
-    sleep (1)
-if enabled_julius == False:
-  print 'Juliusが見つかりませんでした'
-  sys.exit(1)
 
 # メインループ
 def main():
+  debug_message(' 2')
   t=threading.Timer(10,alarm)
   t.setDaemon(True)
   t.start()
+  debug_message(' 3')
+  subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
+  bez.moveAct('happy')
+  # subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイクをオフ
+  subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
+  subprocess.call("sh "+ttsFile+" "+u"ぼく"+name, shell=True)
+  bez.stop()
+  # subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク再開
+  # subprocess.call('sh exec_camera.sh', shell=True)            # カメラの映像をディスプレイに表示
+
+# TCPクライアントを作成しJuliusサーバーに接続する
+  sleep (1)
+  debug_message(' 4')
+  enabled_julius = False
+  for count in range(5):
+    try:
+      debug_message(' 5 try')
+      client.connect(('localhost', 10500))
+      enabled_julius = True
+      break
+    except socket.error, e:
+      debug_message(' 5 miss')
+      print 'failed socket connect. retry'
+      sleep (1)
+  if enabled_julius == False:
+    print 'Juliusが見つかりませんでした'
+    sys.exit(1)
+  debug_message(' 6')
+  data = ""
+  socket_buffer_clear()
   try:
-    subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
-    bez.moveAct('happy')
-    subprocess.call('sudo amixer sset Mic 0 -c 0 -q', shell=True)       # マイクをオフ
-    subprocess.call("sh "+ttsFile+" "+u"こんにちは"+user, shell=True)
-    subprocess.call("sh "+ttsFile+" "+u"ぼく"+name, shell=True)
-    bez.stop()
-    subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク再開
-    data = ""
-    # subprocess.call('sh exec_camera.sh', shell=True)            # カメラの映像をディスプレイに表示
-    socket_buffer_clear()
     while True:
       if "</RECOGOUT>\n." in data:  # RECOGOUTツリーの最終行を見つけたら以下の処理を行う
         parse_recogout(data)
         data = ""  # 認識終了したのでデータをリセットする
       else:
-        debug_message('10: Listening...')
+        debug_message('7: Listening...')
         data = data + client.recv(bufferSize)  # Juliusサーバーから受信
   except KeyboardInterrupt: # CTRL+Cで終了
     debug_message(' 終了しました')

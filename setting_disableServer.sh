@@ -1,5 +1,6 @@
 #!/bin/bash
 # ラズパイのアクセスポイント化を解除し、wifiに接続する設定にする
+cd /home/pi/bezelie/edgar
 # サービス終了
 sudo service isc-dhcp-server stop
 # DHCPサーバ無効化
