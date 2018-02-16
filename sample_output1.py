@@ -11,7 +11,7 @@ import RPi.GPIO as GPIO                # GPIO(汎用入出力端子)ライブラ
 GPIO.setmode(GPIO.BCM)                 # GPIOをGPIO番号で指定できるように設定
 GPIO.setup(27, GPIO.OUT)               # GPIOの27ピンを出力モードに設定
 
-# 関数
+# メインループ
 def main():
   try:
     print "GPIO 27ピンの出力を交互にオンオフします"
