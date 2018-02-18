@@ -213,7 +213,7 @@ function obj2csv(posts){                     //
 }
 
 function debug(text){                        // 
-    fs.appendFileSync(file_debug, text, 'utf8'); // 同期でファイルを読む
+    //fs.appendFileSync(file_debug, text, 'utf8'); // 同期でファイルを読む
 }
 
 //-------------------------------------------------------------------------------------------------------
