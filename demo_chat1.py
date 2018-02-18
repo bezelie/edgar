@@ -172,7 +172,7 @@ def main():
   subprocess.call("sh "+ttsFile+" "+u"ぼく"+name, shell=True)
   bez.stop()
   # subprocess.call('sh exec_camera.sh', shell=True)            # カメラの映像をディスプレイに表示
-  sleep (3)
+  sleep (0.5)
   # TCPクライアントを作成しJuliusサーバーに接続する
   enabled_julius = False
   for count in range(5):
