@@ -11,7 +11,7 @@ import RPi.GPIO as GPIO                # GPIO(汎用入出力端子)ライブラ
 ledRed = 16       # as Red
 ledBlue = 20      # as Blue
 ledGreen = 21     # as Green
-interval = 0.1    # 色変え間隔
+interval = 0.5    # 色変え間隔
 
 # 初期設定
 GPIO.setmode(GPIO.BCM)

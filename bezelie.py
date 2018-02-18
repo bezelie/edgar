@@ -201,8 +201,8 @@ class Control(object): # クラスの定義
         self.stop_event.set()
         self.thread.join()
 
-# Centering Servo Motors
-if __name__ == "__main__":  # Do only when this is done as a script
+# スクリプトとして実行された場合はセンタリングを行う
+if __name__ == "__main__":
   bez = Control()               # べゼリー操作インスタンスの生成
   f = open (jsonFile,'r')
   jDict = json.load(f)

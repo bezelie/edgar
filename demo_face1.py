@@ -28,12 +28,11 @@ f = open (jsonFile,'r')
 jDict = json.load(f)
 name = jDict['data0'][0]['name']       # べゼリーの別名。
 user = jDict['data0'][0]['user']       # ユーザーのニックネーム。
-mic = jDict['data0'][0]['mic']         # マイク感度。62が最大値。
+# mic = jDict['data0'][0]['mic']         # マイク感度。62が最大値。
 vol = jDict['data0'][0]['vol']         # スピーカー音量。
 
 # 変数の初期化
 alarmStop = False   # アラームのスヌーズ機能（非搭載）
-is_playing = False  # 再生中か否かのフラグ
 waitTime = 5        # autoモードでの会話の間隔
 
 # OpenCV
@@ -91,7 +90,7 @@ def replyMessage(keyWord):        # 対話
   # 設定ファイルの読み込み
   f = open (jsonFile,'r')
   jDict = json.load(f)
-  mic = jDict['data0'][0]['mic']         # マイク感度の設定。
+  # mic = jDict['data0'][0]['mic']         # マイク感度の設定。
   vol = jDict['data0'][0]['vol']         # スピーカー音量。
 
   bez.moveRnd()
@@ -127,6 +126,7 @@ def main():
     stageAngle = 0           # ステージの初期角度
     stageDelta = 5           # ループごとにステージを回転させる角度
     stageSpeed = 8           # ループごとにステージを回転させる速度
+    bez.moveHead(15)
     with picamera.PiCamera() as camera:                         # Open Pi-Camera as camera
       with picamera.array.PiRGBArray(camera) as stream:         # Open Video Stream from Pi-Camera as stream
         camera.resolution = (640, 480)                          # Display Resolution
@@ -156,7 +156,7 @@ def main():
             stream.seek(0)                                        # Reset the stream
             stream.truncate()
             stageAngle = stageAngle + stageDelta            
-            if stageAngle > 30 or stageAngle < -30:
+            if stageAngle > 25 or stageAngle < -25:
               stageDelta = stageDelta*(-1)
             bez.moveStage(stageAngle,stageSpeed)
           else:           # 活動時間外は動作しない

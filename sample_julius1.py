@@ -22,8 +22,10 @@ ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh" # 音声合成
 # 設定ファイルの読み込み
 f = open (jsonFile,'r')
 jDict = json.load(f)
-mic = jDict['data0'][0]['mic']         # マイク感度。62が最大値。
+#mic = jDict['data0'][0]['mic']         # マイク感度。
+mic = "60"
 vol = jDict['data0'][0]['vol']         # スピーカー音量。
+subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感度
 
 # 変数の初期化
 muteTime = 1        # 音声入力を無視する時間
@@ -63,19 +65,19 @@ def main():
   try:
     print '音声認識開始'
     subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
-    subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)  # 自分の声を認識してしまわないようにマイクを切る
+    # subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)  # 自分の声を認識してしまわないようにマイクを切る
     subprocess.call("sh "+ttsFile+" こんにちわ", shell=True)
-    subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感受性
+    # subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感度を戻す
     data = ""
     socket_buffer_clear()
     while True:
       if "</RECOGOUT>\n." in data:  # RECOGOUTツリーの最終行を見つけたら以下の処理を行う
         data = re.search(r'WORD\S+', data)    # \s
         keyword = data.group().replace("WORD=","").replace("\"","")
-        subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)  # 自分の声を認識してしまわないようにマイクを切る
+        # subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)  # 自分の声を認識してしまわないようにマイクを切る
         print keyword
         subprocess.call("sh "+ttsFile+" "+keyword, shell=True)
-        subprocess.call('sudo amixer -q sset Mic '+mic+' -c 0', shell=True)  # マイク感受性を元に戻す
+        # subprocess.call('sudo amixer -q sset Mic '+mic+' -c 0', shell=True)  # マイク感度を元に戻す
         socket_buffer_clear()
         data = ""  # 認識終了したのでデータをリセットする
       else:

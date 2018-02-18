@@ -21,10 +21,10 @@ def main():
       head = 0
       while (True):
         bez.moveBack (10)
-        bez.moveStage (30, 2)
+        bez.moveStage (25, 2)
         sleep (0.5)
         bez.moveBack (-10)
-        bez.moveStage (-30, 2)
+        bez.moveStage (-25, 2)
         sleep (0.5)
         head += 10
         if head > 20:

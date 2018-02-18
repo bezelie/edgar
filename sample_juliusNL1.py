@@ -23,8 +23,10 @@ ttsFile  = "/home/pi/bezelie/edgar/exec_openJTalk.sh" # 音声合成
 # 設定ファイルの読み込み
 f = open (jsonFile,'r')
 jDict = json.load(f)
-mic = jDict['data0'][0]['mic']         # マイク感度。62が最大値。
+#mic = jDict['data0'][0]['mic']         # マイク感度。
+mic = "60"
 vol = jDict['data0'][0]['vol']         # スピーカー音量。
+subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感度
 
 # 変数の初期化
 muteTime = 1        # 音声入力を無視する時間
@@ -59,10 +61,10 @@ if enabled_julius == False:
 def main():
   try:
     subprocess.call('amixer cset numid=1 '+vol+'% -q', shell=True)      # スピーカー音量
-    subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)       # 自分の声を認識してしまわないようにマイクを切る
+    # subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)       # 自分の声を認識してしまわないようにマイクを切る
     subprocess.call("sh "+ttsFile+" 音声認識開始", shell=True)
     sleep (muteTime)
-    subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感受性
+    # subprocess.call('sudo amixer sset Mic '+mic+' -c 0 -q', shell=True) # マイク感度を戻す
     socket_buffer_clear()
     print 'ー何か喋ってくださいー'
     data = ""
@@ -76,12 +78,12 @@ def main():
           keyword = ""
           for whypo in root.findall("./SHYPO/WHYPO"):
             keyword = keyword + whypo.get("WORD")
-          subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)        # 自分の声を認識してしまわないようにマイクを切る
+          # subprocess.call('sudo amixer -q sset Mic 0 -c 0', shell=True)        # 自分の声を認識してしまわないようにマイクを切る
           print keyword
           subprocess.call("sh "+ttsFile+" "+keyword, shell=True)
           sleep (muteTime)
           socket_buffer_clear()
-          subprocess.call('sudo amixer -q sset Mic '+mic+' -c 0', shell=True)  # マイク感受性を元に戻す
+          # subprocess.call('sudo amixer -q sset Mic '+mic+' -c 0', shell=True)  # マイク感度を元に戻す
           print "ー何か喋ってくださいー"
         except:
           print "----- except -----"

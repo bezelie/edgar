@@ -10,7 +10,7 @@ def main():
   try:
     print "開始します"
     while True:
-      print "実行してます"
+      print "実行中です"
       sleep (1)                        # １秒待つ
   except KeyboardInterrupt:            # コントロール＋Cが押された場合の処理
     print "終了しました"
