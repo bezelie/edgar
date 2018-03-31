@@ -43,7 +43,7 @@ def main():
       sleep (0.5)
       print "Stage 中央"
       bez.moveStage(0)                # 体の左右
-      sleep (1)
+      sleep (5)
   except KeyboardInterrupt:
     print "  終了しました"
 

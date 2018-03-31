@@ -15,7 +15,7 @@ def main():
   try:
     while (True):
       subprocess.call("sh "+ttsFile+" "+"こんにちわ", shell=True)
-#      subprocess.call('flite -voice "kal16" -t "Hello World!"', shell=True) # English
+#      subprocess.call('flite -voice "slt" -t "alexa"', shell=True) # English
        # Other English Voices :kal awb_time kal16 awb rms slt
       sleep(0.5)
   except KeyboardInterrupt:
