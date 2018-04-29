@@ -24,6 +24,9 @@ backOld = backNow
 stageNow = 0
 stageOld = stageNow
 
+# 変数
+ttsFile = "/home/pi/bezelie/edgar/exec_openJTalk.sh" # 発話シェルスクリプトのファイル名
+
 # MCP3208からSPI通信で12ビットのデジタル値を取得。0から7の8チャンネル使用可
 def readadc(adcnum, clockpin, mosipin, misopin, cspin):
     if adcnum > 7 or adcnum < 0:
@@ -73,22 +76,28 @@ try:
       print "スイッチ24が押されています"
       r = randint(1,3)
       if r > 2:
-        subprocess.call('flite -voice "slt" -t "Nice to meet you"', shell=True) # $
+        subprocess.call("sh "+ttsFile+" "+"こんにちわ", shell=True)
+        #subprocess.call('flite -voice "slt" -t "Nice to meet you"', shell=True) # $
       elif r > 1:
-        subprocess.call('flite -voice "slt" -t "I am grad to meet you"', shell=True) # $
+        subprocess.call("sh "+ttsFile+" "+"お元気ですか", shell=True)
+        #subprocess.call('flite -voice "slt" -t "I am grad to meet you"', shell=True) # $
       else:
-        subprocess.call('flite -voice "slt" -t "Hi, ! am Bezelie"', shell=True) # $
-       # Other English Voices :kal awb_time kal16 awb rms slt
+        subprocess.call("sh "+ttsFile+" "+"僕はべゼリー", shell=True)
+        #subprocess.call('flite -voice "slt" -t "Hi, ! am Bezelie"', shell=True) # $
+        # Other English Voices :kal awb_time kal16 awb rms slt
       continue
     if GPIO.input(24)==GPIO.HIGH:    # GPIO24に3.3Vの電圧がかかっていたら・・$
       print "スイッチ25が押されています"
       r = randint(1,3)
       if r > 2:
-        subprocess.call('flite -voice "slt" -t "It is awesome!"', shell=True) # $
+        subprocess.call("sh "+ttsFile+" "+"そだねー", shell=True)
+        #subprocess.call('flite -voice "slt" -t "It is awesome!"', shell=True) # $
       elif r > 1:
-        subprocess.call('flite -voice "slt" -t "That is great!"', shell=True) # $
+        subprocess.call("sh "+ttsFile+" "+"すごーい", shell=True)
+        #subprocess.call('flite -voice "slt" -t "That is great!"', shell=True) # $
       else:
-        subprocess.call('flite -voice "slt" -t "How wonderful it is!"', shell=True) # $
+        subprocess.call("sh "+ttsFile+" "+"すばらしー", shell=True)
+        #subprocess.call('flite -voice "slt" -t "How wonderful it is!"', shell=True) # $
       continue
 
     inputVal0 = readadc(0, SPICLK, SPIMOSI, SPIMISO, SPICS)
@@ -101,23 +110,25 @@ try:
       bez.moveStage(inputVal0)
 
     inputVal1 = readadc(1, SPICLK, SPIMOSI, SPIMISO, SPICS)
-    inputVal1 = inputVal1*60/4096-30
-    if inputVal1 > 30:inputVal1=30
+    inputVal1 = inputVal1*40/4096-30
+    if inputVal1 > 20:inputVal1=20
     if inputVal1 < -30:inputVal1=-30
-    print("back:"+str(inputVal1))
-    if abs(inputVal1 - backOld) > 4:
-      backOld = inputVal1
-      bez.moveBack(inputVal1)
+    inputVal1 = inputVal1*(-1)
+    print("head:"+str(inputVal1))
+    if abs(inputVal1 - headOld) > 4:
+      headOld = inputVal1
+      bez.moveHead(inputVal1)
 
     inputVal2 = readadc(2, SPICLK, SPIMOSI, SPIMISO, SPICS)
-    inputVal2 = inputVal2*40/4096-30
-    if inputVal2 > 20:inputVal2=20
+    inputVal2 = inputVal2*60/4096-30
+    if inputVal2 > 30:inputVal2=30
     if inputVal2 < -30:inputVal2=-30
     inputVal2 = inputVal2*(-1)
-    print("head:"+str(inputVal2))
-    if abs(inputVal2 - headOld) > 4:
-      headOld = inputVal2
-      bez.moveHead(inputVal2)
+    print("back:"+str(inputVal2))
+    if abs(inputVal2 - backOld) > 4:
+      backOld = inputVal2
+      bez.moveBack(inputVal2)
+
     sleep(0.1)
 
 except KeyboardInterrupt:

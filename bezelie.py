@@ -19,7 +19,7 @@ jsonFile = "/home/pi/bezelie/edgar/data_chat.json"        # 設定ファイル
 class Control(object): # クラスの定義
 
     # 初期化メソッド。インスタンス生成時に自動実行される。
-    def __init__(self, address_pca9685=0x40, dutyMax=490, dutyMin=110, dutyCenter=300, steps=1):
+    def __init__(self, address_pca9685=0x40, dutyMax=490, dutyMin=110, dutyCenter=300, steps=2):
         f = open (jsonFile,'r')
         jDict = json.load(f)
         self.headTrim = int(jDict['data2'][0]['head'])    # トリム値の読み込み
